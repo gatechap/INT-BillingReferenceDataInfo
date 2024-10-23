@@ -1,0 +1,41 @@
+spring:
+  profiles: uat5
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:oracle:thin:@//172.19.192.186:1565/TEST02
+    username: TRUAPP29
+    password: TRUAPP29
+    driverClassName: oracle.jdbc.OracleDriver
+    hikari:
+      maximumPoolSize: 10
+      connectionTimeout: 5000
+      idleTimeout: 30000
+  secondarydatasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:oracle:thin:@172.19.8.213:1555/CESGDEV
+    username: abpdccb2
+    password: abpdccb2#1234
+    driverClassName: oracle.jdbc.OracleDriver
+    hikari:
+      maximumPoolSize: 1
+      connectionTimeout: 5000
+  environment-ctrl:
+    defaultBillingSystem: CCBS
+    defaultBillingSystemRef: CCBS
+    goldenDbVersion: 1
+  resources:
+    static-locations: classpath:/static/
+server:
+  port: 8080
+  servlet:
+    context-path: /BillingReferenceDataInfo
+service:
+  -
+    name: "getMigrationSystemInfo"
+    endpoint: "https://intxgw-uat5.true.th/CCBSCommonInfo/MigrationInfo/getMigrationSystemInfo"
+    system: "INTX"
+    user: "ITSD_INTX"
+    password: "INTXOPER1"
+    apiname: "getMigrationSystemInfo"
+    connectionTimeout: 5000
+    readTimeout: 30000

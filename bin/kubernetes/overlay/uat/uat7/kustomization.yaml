@@ -1,0 +1,7 @@
+bases:
+- ../../../base
+nameSuffix: -uat7
+commonLabels:
+  app: deploy-billingreferencedatainfo-uat7
+patchesStrategicMerge:
+- patch.yaml

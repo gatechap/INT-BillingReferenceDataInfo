@@ -1,0 +1,16 @@
+spring:
+  profiles: prod
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:oracle:thin:@//172.19.198.109:1521/DCCB
+    username: k8sappc
+    password: k8sappc#123
+    driverClassName: oracle.jdbc.OracleDriver
+    hikari:
+      maximumPoolSize: 10
+      connectionTimeout: 5000
+      idleTimeout: 30000
+server:
+  port: 8080
+  servlet:
+    context-path: /BillingReferenceDataInfo

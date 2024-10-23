@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-billingreferencedatainfo
+  namespace: intatom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deploy-billingreferencedatainfo
+      env: sit2
+      version: 1.0.0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%  
+  template:
+    metadata:
+      labels:
+        app: deploy-billingreferencedatainfo
+        env: sit2
+        version: 1.0.0
+    spec:
+      containers:
+      - name: containers-billingreferencedatainfo
+        env:
+        - name: env
+          value: sit2
+        - name: spring.profiles.active
+          value: sit2
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: billingreferencedatainfo-config
+  namespace: intatom
+data:
+  application.yml: |-
+    greeting:
+        message: Say Hello to the World
+    ---
+    spring:
+      profiles: sit2
+      datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:oracle:thin:@//172.19.192.186:1565/TEST02
+        username: TRUAPP12
+        password: TRUAPP12
+        driverClassName: oracle.jdbc.OracleDriver
+        hikari:
+          maximumPoolSize: 5
+          connectionTimeout: 5000
+      secondarydatasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:oracle:thin:@//172.19.8.213:1555/CESGDEV
+        username: TRUAPP34
+        password: TRUAPP34#123
+        driverClassName: oracle.jdbc.OracleDriver
+        hikari:
+          maximumPoolSize: 1
+          connectionTimeout: 5000
+      environment-ctrl:
+        defaultBillingSystem: CCBS
+        defaultBillingSystemRef: CCBS
+        goldenDbVersion: 1
+    server:
+      port: 8080
+      servlet:
+        context-path: /BillingReferenceDataInfo
+    service:
+      -
+        name: "getMigrationSystemInfo"
+        endpoint: "https://intxgw-sit2.true.th/CCBSCommonInfo/MigrationInfo/getMigrationSystemInfo"
+        system: "INTX"
+        user: "ITSD_INTX"
+        password: "INTXOPER1"
+        apiname: "getMigrationSystemInfo"
+        connectionTimeout: 5000
+        readTimeout: 30000
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: api-billingreferencedatainfo
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  namespace: intatom
+spec:
+  rules:
+  - host: api-billingreferencedatainfo-sit2.intatom.arctic.true.th
+    http:
+      paths:
+        - backend:
+            serviceName: service-billingreferencedatainfo
+            servicePort: 80
+          path: /
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-billingreferencedatainfo
+  namespace: intatom
+  labels:
+    app: service-billingreferencedatainfo
+    env: sit2
+    version: 1.0.0

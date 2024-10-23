@@ -1,0 +1,7 @@
+bases:
+- ../../../base
+nameSuffix: -dev
+commonLabels:
+  app: deploy-billingreferencedatainfo-dev
+patchesStrategicMerge:
+- patch.yaml

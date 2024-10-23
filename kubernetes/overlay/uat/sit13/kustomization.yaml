@@ -1,0 +1,7 @@
+bases:
+- ../../../base
+nameSuffix: -sit13
+commonLabels:
+  app: deploy-billingreferencedatainfo-sit13
+patchesStrategicMerge:
+- patch.yaml

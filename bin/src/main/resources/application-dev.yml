@@ -1,0 +1,16 @@
+spring:
+  profiles: dev
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:oracle:thin:@//172.19.193.20:1560/TEST03
+    username: RMVAPP2
+    password: RMVAPP2
+    driverClassName: oracle.jdbc.OracleDriver
+    hikari:
+      maximumPoolSize: 10
+      connectionTimeout: 5000
+      idleTimeout: 30000
+server:
+  port: 8080
+  servlet:
+    context-path: /BillingReferenceDataInfo

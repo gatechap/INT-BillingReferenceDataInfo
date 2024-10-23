@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: billingreferencedatainfo-config
+  namespace: intatom
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-billingreferencedatainfo
+  namespace: intatom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deploy-billingreferencedatainfo
+      env: uat
+      version: 1.0.0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%   
+  template:
+    metadata:
+      labels:
+        app: deploy-billingreferencedatainfo
+        env: uat
+        version: 1.0.0
+    spec:
+      containers:
+      - name: containers-billingreferencedatainfo
+        image: ${image}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: spring.profiles.active
+          value: uat
+        - name: spring.config.location
+          value: "/data/BOOT-INF/classes/application.yml"
+        resources:
+          limits:
+            memory: 512Mi
+            ephemeral-storage: 50Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+            ephemeral-storage: 10Mi
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /BillingReferenceDataInfo
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /BillingReferenceDataInfo/index.html
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5  
+        envFrom:
+        - configMapRef:
+            name: billingreferencedatainfo-config
+        volumeMounts:
+          - name: billingreferencedatainfo-config
+            mountPath: /data/BOOT-INF/classes/
+            readOnly: true
+      volumes:
+        - name: billingreferencedatainfo-config
+          configMap:
+            name: billingreferencedatainfo-config
+            items:
+              - key: application.yml
+                path: application.yml
+      imagePullSecrets:
+      - name: intregcred
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-billingreferencedatainfo
+  namespace: intatom
+  labels:
+    app: service-billingreferencedatainfo
+    env: uat
+    version: 1.0.0
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: deploy-billingreferencedatainfo
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: api-billingreferencedatainfo
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  namespace: intatom
+spec:
+  rules:
+  - host: aa.intatom.arctic.true.th
+    http:
+      paths:
+        - backend:
+            serviceName: service-billingreferencedatainfo
+            servicePort: 80
+          path: /
